@@ -1,0 +1,47 @@
+name: "Normalise";
+version: @Normalise_VERSION_MAJOR@.@Normalise_VERSION_MINOR@.@Normalise_VERSION_PATCH@;
+description: "Normalises audio to peak at the specified level";
+author: "Dougal Stewart";
+
+supports: [ inplace ];
+binary: {
+	linux: "normalise.so";
+	macos: "normalise.dylib";
+	windows: "normalise.dll";
+};
+
+input_ports: [
+	{
+		name: "Audio Left";
+		type: audio;
+		port_index: 0;
+	},
+	{
+		name: "Audio Right";
+		type: audio;
+		port_index: 1;
+	},
+	{
+		name: "Peak";
+		type: parameter;
+		properties: [ ];
+		port_index: 2;
+		default: 0.0;
+		min: -24.0;
+		max: 0.0;
+		units: "dB";
+	}
+];
+
+output_ports: [
+	{
+		name: "Audio Left";
+		type: audio;
+		port_index: 0;
+	},
+	{
+		name: "Audio Right";
+		type: audio;
+		port_index: 1;
+	}
+];

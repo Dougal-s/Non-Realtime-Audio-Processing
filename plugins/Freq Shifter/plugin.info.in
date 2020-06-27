@@ -1,0 +1,47 @@
+name: "Freq Shifter";
+version: @FreqShifter_VERSION_MAJOR@.@FreqShifter_VERSION_MINOR@.@FreqShifter_VERSION_PATCH@;
+description: "A frequency shifter";
+author: "Dougal Stewart";
+
+supports: [];
+binary: {
+	linux: "freq_shifter.so";
+	macos: "freq_shifter.dylib";
+	windows: "freq_shifter.dll";
+};
+
+input_ports: [
+	{
+		name: "Audio Left";
+		type: audio;
+		port_index: 0;
+	},
+	{
+		name: "Audio Right";
+		type: audio;
+		port_index: 1;
+	},
+	{
+		name: "Hertz";
+		type: parameter;
+		properties: [];
+		port_index: 2;
+		default: 0.0;
+		min: -10000.0;
+		max: 10000.0;
+		units: "Hz";
+	}
+];
+
+output_ports: [
+	{
+		name: "Audio Left";
+		type: audio;
+		port_index: 0;
+	},
+	{
+		name: "Audio Right";
+		type: audio;
+		port_index: 1;
+	}
+];
