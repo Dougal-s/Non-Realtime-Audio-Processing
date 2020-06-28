@@ -10,7 +10,7 @@ This project is a program for non-realtime processing of audio files. There are 
 ### Compilation
 First clone the project into your current directory using:
 ```
-git clone https://github.com/Dougal-s/Non-Realtime-Audio-Proccessing.git
+git clone https://github.com/Dougal-s/Non-Realtime-Audio-Processing.git
 cd Non-Realtime-Audio-Proccessing
 ```
 
