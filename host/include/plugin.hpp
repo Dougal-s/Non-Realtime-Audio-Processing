@@ -39,7 +39,10 @@ struct Port {
 	float min = 0.f, max = 1.f;
 	float default_value = 0.5;
 
-	float value = 0.5f;
+	union {
+		float value = 0.5f;
+		float* value_arr;
+	};
 };
 
 inline Port::Properties operator&(Port::Properties lhs, Port::Properties rhs) {
@@ -94,7 +97,7 @@ struct Plugin {
 
 	void load_plugin();
 
-	void run(size_t n_samples, double sample_rate) const;
+	void run(size_t n_samples, double sample_rate);
 
 	operator bool() const { return !path.empty(); };
 };

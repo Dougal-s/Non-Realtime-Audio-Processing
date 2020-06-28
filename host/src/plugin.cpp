@@ -301,10 +301,31 @@ void Plugin::load_plugin() {
 	pfn_process = reinterpret_cast<Process_Function>(plugin_library.get_function_address("process"));
 }
 
-void Plugin::run(size_t n_samples, double sample_rate) const {
+void Plugin::run(size_t n_samples, double sample_rate) {
+	// create arrays for automatable ports
+	for (size_t port = 0; port < input_port_infos.size(); ++port) {
+		if (input_port_infos[port].properties | Port::Properties::automatable) {
+			float value = input_port_infos[port].value;
+			input_port_infos[port].value_arr = new float[n_samples];
+			for (size_t i = 0; i < n_samples; ++i)
+				input_port_infos[port].value_arr[i] = value;
+			input_ports[port] = input_port_infos[port].value_arr;
+		}
+	}
+
 	Global_Parameters params = {
 		sample_rate,
 		path.c_str()
 	};
 	(*pfn_process)(&params, input_ports.data(), output_ports.data(), n_samples);
+
+	// destroy arrays for automatable ports
+	for (size_t port = 0; port < input_port_infos.size(); ++port) {
+		if (input_port_infos[port].properties | Port::Properties::automatable) {
+			float value = input_port_infos[port].value_arr[0];
+			delete[] input_port_infos[port].value_arr;
+			input_port_infos[port].value = value;
+			input_ports[port] = &input_port_infos[port].value;
+		}
+	}
 }
