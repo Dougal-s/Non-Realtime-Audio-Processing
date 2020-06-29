@@ -39,10 +39,9 @@ struct Port {
 	float min = 0.f, max = 1.f;
 	float default_value = 0.5;
 
-	union {
-		float value = 0.5f;
-		float* value_arr;
-	};
+	const float* value_arr;
+	float value = 0.5f;
+	bool automated = false;
 };
 
 inline Port::Properties operator&(Port::Properties lhs, Port::Properties rhs) {
@@ -94,6 +93,12 @@ struct Plugin {
 	void parse_plugin_file(const std::filesystem::path& path);
 
 	void set_parameter(const std::string& parameter_name, float new_value);
+
+	void reset_parameter(const std::string& parameter_name);
+
+	void set_automation(const std::string& parameter_name, const float* automation);
+
+	void clear_automation(const std::string& parameter_name);
 
 	void load_plugin();
 

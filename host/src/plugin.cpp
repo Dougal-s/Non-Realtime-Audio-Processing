@@ -296,6 +296,40 @@ void Plugin::set_parameter(const std::string& parameter_name, float new_value) {
 	throw std::invalid_argument("'" + parameter_name + "' does not match any known parameters");
 }
 
+void Plugin::reset_parameter(const std::string& parameter_name) {
+	for (auto& port : input_port_infos) {
+		if (port.type == Port::Type::parameter && port.name == parameter_name) {
+			port.value = port.default_value;
+			return;
+		}
+	}
+	throw std::invalid_argument("'" + parameter_name + "' does not match any known parameters");
+}
+
+void Plugin::set_automation(const std::string& parameter_name, const float* automation) {
+	for (auto& port : input_port_infos) {
+		if (port.type == Port::Type::parameter && port.name == parameter_name) {
+			if (port.properties & Port::Properties::automatable) {
+				port.value_arr = automation;
+				port.automated = true;
+				return;
+			}
+			throw std::invalid_argument("Unable to automate parameter '" + parameter_name + "'");
+		}
+	}
+	throw std::invalid_argument("'" + parameter_name + "' does not match any known parameters");
+}
+
+void Plugin::clear_automation(const std::string& parameter_name) {
+	for (auto& port : input_port_infos) {
+		if (port.type == Port::Type::parameter && port.name == parameter_name) {
+			port.value = port.value_arr[0];
+			port.automated = false;
+		}
+	}
+	throw std::invalid_argument("'" + parameter_name + "' does not match any known parameters");
+}
+
 void Plugin::load_plugin() {
 	plugin_library = Dynamic_Library(path / binary);
 	pfn_process = reinterpret_cast<Process_Function>(plugin_library.get_function_address("process"));
@@ -304,11 +338,14 @@ void Plugin::load_plugin() {
 void Plugin::run(size_t n_samples, double sample_rate) {
 	// create arrays for automatable ports
 	for (size_t port = 0; port < input_port_infos.size(); ++port) {
-		if (input_port_infos[port].properties | Port::Properties::automatable) {
-			float value = input_port_infos[port].value;
-			input_port_infos[port].value_arr = new float[n_samples];
+		if ((input_port_infos[port].type == Port::Type::parameter)
+		    && (input_port_infos[port].properties & Port::Properties::automatable)
+		    && !input_port_infos[port].automated
+		) {
+			float* arr = new float[n_samples];
 			for (size_t i = 0; i < n_samples; ++i)
-				input_port_infos[port].value_arr[i] = value;
+				arr[i] = input_port_infos[port].value;
+			input_port_infos[port].value_arr = arr;
 			input_ports[port] = input_port_infos[port].value_arr;
 		}
 	}
@@ -321,11 +358,12 @@ void Plugin::run(size_t n_samples, double sample_rate) {
 
 	// destroy arrays for automatable ports
 	for (size_t port = 0; port < input_port_infos.size(); ++port) {
-		if (input_port_infos[port].properties | Port::Properties::automatable) {
-			float value = input_port_infos[port].value_arr[0];
-			delete[] input_port_infos[port].value_arr;
-			input_port_infos[port].value = value;
+		if ((input_port_infos[port].type == Port::Type::parameter)
+		    && (input_port_infos[port].properties & Port::Properties::automatable)
+		    && !input_port_infos[port].automated
+		) {
 			input_ports[port] = &input_port_infos[port].value;
+			delete[] input_port_infos[port].value_arr;
 		}
 	}
 }
