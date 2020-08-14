@@ -17,5 +17,6 @@ project(Plugins)
 
 add_subdirectory(common/fft common/fft)
 
+add_subdirectory("Monoifier" "${CMAKE_HOST_SYSTEM_NAME}/Monoifier")
 add_subdirectory("Freq Shifter" "${CMAKE_HOST_SYSTEM_NAME}/Freq Shifter")
 add_subdirectory("Normalise" "${CMAKE_HOST_SYSTEM_NAME}/Normalise")

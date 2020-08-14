@@ -1,0 +1,40 @@
+name: "Monoifier";
+version: @Monoifier_VERSION_MAJOR@.@Monoifier_VERSION_MINOR@.@Monoifier_VERSION_PATCH@;
+description: "Combines both channels in a stereo signal into a single signal in interesting ways";
+author: "Dougal Stewart";
+
+supports: [];
+binary: {
+	linux: "monoifier.so";
+	macos: "monoifier.dylib";
+	windows: "monoifier.dll";
+};
+
+input_ports: [
+	{
+		name: "Audio Left";
+		type: audio;
+		port_index: 0;
+	},
+	{
+		name: "Audio Right";
+		type: audio;
+		port_index: 1;
+	},
+	{
+		name: "Mode";
+		type: parameter;
+		port_index: 2;
+		default: 0;
+		min: 0;
+		max: 3;
+	}
+];
+
+output_ports: [
+	{
+		name: "Audio Out";
+		type: audio;
+		port_index: 0;
+	}
+];
