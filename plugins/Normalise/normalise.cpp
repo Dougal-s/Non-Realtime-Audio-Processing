@@ -19,9 +19,16 @@ SYMBOL_EXPORT void process([[maybe_unused]] const Global_Parameters* global,
                            float* const* output_ports,
                            size_t n_samples) {
 	float threshold_ampl = exp10(*input_ports[in_peak]/20.f);
-	float left_max = *std::max_element(input_ports[in_left], input_ports[in_left]+n_samples);
-	float right_max = *std::max_element(input_ports[in_right], input_ports[in_right]+n_samples);
-	float ratio = threshold_ampl/std::max(left_max, right_max);
+
+	float max = 0.0;
+	for (std::size_t sample = 0; sample < n_samples; ++sample) {
+		if (std::abs(input_ports[in_left][sample]) > max)
+			max = std::abs(input_ports[in_left][sample]);
+		if (std::abs(input_ports[in_right][sample]) > max)
+			max = std::abs(input_ports[in_right][sample]);
+	}
+	max = max == 0 ? 1 : max; // set max = 1 if max is 0
+	float ratio = threshold_ampl/max;
 	for (size_t sample = 0; sample < n_samples; ++sample) {
 		output_ports[out_left][sample] = ratio*input_ports[in_left][sample];
 		output_ports[out_right][sample] = ratio*input_ports[in_right][sample];
